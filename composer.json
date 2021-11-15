@@ -1,0 +1,41 @@
+{
+  "name": "noxkiwi/crud",
+  "description": "I am the Bucket file manager.",
+  "version": "1.0.0",
+  "type": "package",
+  "license": "proprietary",
+  "keywords": [
+    "Crud",
+    "Create",
+    "Read",
+    "Update",
+    "Delete"
+  ],
+  "homepage": "https://nox.kiwi/",
+  "time": "2020-06-10",
+  "authors": [
+    {
+      "name": "Jan Nox",
+      "email": "jan@nox.kiwi",
+      "homepage": "https://nox.kiwi",
+      "role": "Lead Developer"
+    }
+  ],
+  "require": {
+    "php": ">=8.0.0",
+    "noxkiwi/core": "*",
+    "noxkiwi/hook": "*",
+    "noxkiwi/modal": "*",
+    "noxkiwi/log": "*",
+    "noxkiwi/dataabstraction": "*"
+  },
+  "require-dev": {
+    "roave/security-advisories": "dev-master",
+    "phpunit/phpunit": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "noxkiwi\\crud\\": "backend/class/"
+    }
+  }
+}
