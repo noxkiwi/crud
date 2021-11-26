@@ -12,6 +12,7 @@ use noxkiwi\core\Response;
 use noxkiwi\crud\Crud;
 use noxkiwi\dataabstraction\Model;
 use noxkiwi\dataabstraction\Validator\Text\ModelfieldValidator;
+use function explode;
 use function in_array;
 use const E_ERROR;
 
@@ -19,7 +20,7 @@ use const E_ERROR;
  * I am
  *
  * @package      noxkiwi\crud
- * @author       Jan Nox <jan@nox.kiwi>
+ * @author       Jan Nox <jan.nox@pm.me>
  * @license      https://nox.kiwi/license
  * @copyright    2020 noxkiwi
  * @version      1.0.0

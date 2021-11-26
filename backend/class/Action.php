@@ -9,7 +9,7 @@ use function var_dump;
  * May it be an ENTRY related action, a BULK action or any other kind of action.
  *
  * @package      noxkiwi\crud
- * @author       Jan Nox <jan@nox.kiwi>
+ * @author       Jan Nox <jan.nox@pm.me>
  * @license      https://nox.kiwi/license
  * @copyright    2020 nox.kiwi
  * @version      1.0.0

@@ -7,7 +7,7 @@ use noxkiwi\crud\Manipulator;
  * I am the basic Manipulator class for all column manipulators.
  *
  * @package      noxkiwi\crud
- * @author       Jan Nox <jan@nox.kiwi>
+ * @author       Jan Nox <jan.nox@pm.me>
  * @license      https://nox.kiwi/license
  * @copyright    2021 nox.kiwi
  * @version      1.0.0
