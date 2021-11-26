@@ -29,18 +29,21 @@ use noxkiwi\log\Traits\LogTrait;
 use noxkiwi\modal\ModalSetting;
 use noxkiwi\modal\ModalSize;
 use function class_exists;
+use function end;
+use function explode;
 use function in_array;
 use function is_array;
 use function str_ends_with;
 use function str_replace;
 use function strtolower;
+use function uniqid;
 use const E_USER_NOTICE;
 
 /**
  * I am
  *
  * @package      noxkiwi\crud
- * @author       Jan Nox <jan@nox.kiwi>
+ * @author       Jan Nox <jan.nox@pm.me>
  * @license      https://nox.kiwi/license
  * @copyright    2020 - 2021 nox.kiwi
  * @version      1.0.1

@@ -13,12 +13,14 @@ use function class_exists;
 use function count;
 use function get_class;
 use function microtime;
+use function print_r;
+use function round;
 
 /**
  * I am the Queue Consumer for all Crud related Messages.
  *
  * @package      noxkiwi\crud
- * @author       Jan Nox <jan@nox.kiwi>
+ * @author       Jan Nox <jan.nox@pm.me>
  * @license      https://nox.kiwi/license
  * @copyright    2020 nox.kiwi
  * @version      1.0.0

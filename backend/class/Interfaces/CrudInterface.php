@@ -9,7 +9,7 @@ use noxkiwi\formbuilder\Form;
  * I am the interface of the CRUD classes.
  *
  * @package      noxkiwi\crud\Interfaces
- * @author       Jan Nox <jan@nox.kiwi>
+ * @author       Jan Nox <jan.nox@pm.me>
  * @license      https://nox.kiwi/license
  * @copyright    2020 nox.kiwi
  * @version      1.0.0

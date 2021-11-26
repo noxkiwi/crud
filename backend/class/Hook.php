@@ -7,7 +7,7 @@ use noxkiwi\hook\Hook as BaseHook;
  * I am the collection of hooks for the CRUD System.
  *
  * @package      noxkiwi\crud
- * @author       Jan Nox <jan@nox.kiwi>
+ * @author       Jan Nox <jan.nox@pm.me>
  * @license      https://nox.kiwi/license
  * @copyright    2020 - 2021 nox.kiwi
  * @version      1.0.1

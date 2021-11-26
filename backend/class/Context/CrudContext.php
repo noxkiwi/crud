@@ -9,6 +9,7 @@ use noxkiwi\crud\Manipulator;
 use noxkiwi\dataabstraction\Model;
 use noxkiwi\modal\ModalSetting;
 use noxkiwi\modal\ModalSize;
+use function explode;
 use function is_string;
 use const E_ERROR;
 
@@ -23,7 +24,7 @@ use const E_ERROR;
  * @uses         \noxkiwi\crud\Context\CrudContext::viewCreate()
  *   -  This is a view that shows the empty form for creating a new entry for the model.
  *
- * @author       Jan Nox <jan@nox.kiwi>
+ * @author       Jan Nox <jan.nox@pm.me>
  * @license      https://nox.kiwi/license
  * @copyright    2021 noxkiwi
  * @version      1.0.0
