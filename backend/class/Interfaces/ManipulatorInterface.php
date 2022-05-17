@@ -13,11 +13,33 @@ namespace noxkiwi\crud\Interfaces;
  */
 interface ManipulatorInterface
 {
+    /**
+     * @param array $responseRow
+     * @param array $dataset
+     *
+     * @return array
+     */
     public function manipulateRow(array $responseRow, array $dataset): array;
 
+    /**
+     * @param string $fieldName
+     * @param array  $dataset
+     *
+     * @return mixed
+     */
     public function manipulateField(string $fieldName, array $dataset);
 
+    /**
+     * @param array $datasets
+     *
+     * @return array
+     */
     public function manipulateDatasets(array $datasets): array;
 
+    /**
+     * @param array $dataset
+     *
+     * @return array
+     */
     public function manipulateDataset(array $dataset): array;
 }

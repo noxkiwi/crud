@@ -75,7 +75,7 @@ abstract class CrudfrontendContext extends Context
     public static function fetchModel(string $modelName): Model
     {
         $modelName     .= 'Model';
-        $namespaceInfo = (array)explode('\\Context', static::class);
+        $namespaceInfo = explode('\\Context', static::class);
         /** @var \noxkiwi\dataabstraction\Model $modelPointer */
         $modelPointer = "\\{$namespaceInfo[0]}\\Model\\{$modelName}";
 
@@ -108,7 +108,7 @@ abstract class CrudfrontendContext extends Context
             'searching'     => true,
             'oSearch'       => ['sSearch' => $this->request->get('q', '')],
             'serverSide'    => false,
-            'stateSave'     => true,
+            'stateSave'     => false,
             'ajax'          => LinkHelper::get([Mvc::CONTEXT => 'crud', Mvc::VIEW => 'list', 'modelName' => $this->modelName]),
             'dom'           => 'Bfrtip',
             'orderMulti'    => true,

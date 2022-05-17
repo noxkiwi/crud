@@ -69,6 +69,9 @@ abstract class CrudContext extends Context
         $this->manipulator = $manipulator;
     }
 
+    /**
+     * @return \noxkiwi\crud\Crud
+     */
     final protected function getCrud(): Crud
     {
         return $this->crud;
@@ -97,6 +100,9 @@ abstract class CrudContext extends Context
         $this->response->set('data', $responseRows);
     }
 
+    /**
+     * @return bool
+     */
     public function isAllowed(): bool
     {
         return true;
@@ -126,6 +132,11 @@ abstract class CrudContext extends Context
         $this->response->set(ModalSetting::SIZE, ModalSize::X_LARGE);
     }
 
+    /**
+     * @param string $modelName
+     *
+     * @return \noxkiwi\dataabstraction\Model
+     */
     public static function fetchModel(string $modelName): Model
     {
         $modelName     .= 'Model';

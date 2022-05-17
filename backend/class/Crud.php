@@ -129,6 +129,11 @@ final class Crud implements CrudInterface
         return $this->config;
     }
 
+    /**
+     * @param string $modelName
+     *
+     * @return \noxkiwi\dataabstraction\Model
+     */
     public static function fetchModel(string $modelName): Model
     {
         $modelName     .= 'Model';
@@ -423,7 +428,7 @@ final class Crud implements CrudInterface
         $model->search();
         $rows                             = $model->getResult();
         foreach ($rows as $row) {
-            $value                                    = $row[$fieldDefinition->foreign['value']];
+            $value                                    = $row[$fieldDefinition->foreign['value']] ?? null;
             $fieldData[Field::FIELD_ELEMENTS][$value] = [
                 'value'   => $value,
                 'display' => StringHelper::interpolate($fieldDefinition->foreign['display'], $row)
