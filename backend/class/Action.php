@@ -2,7 +2,6 @@
 namespace noxkiwi\crud;
 
 use noxkiwi\frontend\Tag\Html\Anchor;
-use function var_dump;
 
 /**
  * I am an action for the CRUD system.

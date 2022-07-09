@@ -96,12 +96,14 @@ $modal = <<<HTML
 </div>
 HTML;
 // SCRIPT
-$json   = JsonHelper::encode($constructorObject);
-$script = <<<HTML
+$json       = JsonHelper::encode($constructorObject);
+$coreScript = LinkHelper::get([Mvc::CONTEXT => 'resource', Mvc::VIEW => 'file', 'file' => 'js/Core']);# /?context=resource&file=js%2FCore
+$crudScript = LinkHelper::get([Mvc::CONTEXT => 'resource', Mvc::VIEW => 'file', 'file' => 'js/Crud']);# /?context=resource&file=js%2FCore
+$script     = <<<HTML
 <script>var list;</script>
-<script src="/?context=resource&file=js%2FCore"></script>
+<script src="$coreScript"></script>
 <script type="module">
-    import Crud from '/?context=resource&file=js%2FCrud';
+    import Crud from '/$crudScript';
     let crud = new Crud('$crudId', $json);
 </script>
 HTML;

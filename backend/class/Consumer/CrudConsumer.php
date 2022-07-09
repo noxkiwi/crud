@@ -6,7 +6,6 @@ use noxkiwi\core\Exception\InvalidArgumentException;
 use noxkiwi\core\Traits\LanguageImprovementTrait;
 use noxkiwi\crud\Message\BulkDeleteMessage;
 use noxkiwi\crud\Message\BulkEditMessage;
-use noxkiwi\dataabstraction\Model;
 use noxkiwi\queue\Consumer\RabbitmqConsumer;
 use noxkiwi\queue\Message;
 use function class_exists;
@@ -40,7 +39,7 @@ final class CrudConsumer extends RabbitmqConsumer
      */
     public function process(Message $message): bool
     {
-        $this->logDebug(" [*] Message is of type {$this->returnIt(get_class($message))}");
+        $this->logDebug(" [*] Message is of type {$this->returnIt($message::class)}");
         if ($message instanceof BulkEditMessage) {
             return $this->processBulkEdit($message);
         }

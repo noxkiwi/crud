@@ -35,22 +35,38 @@ class Manipulator implements ManipulatorInterface
     private Model  $model;
     private Config $config;
 
+    /**
+     * @param \noxkiwi\dataabstraction\Model $model
+     * @param \noxkiwi\core\Config           $config
+     */
     public function __construct(Model $model, Config $config)
     {
         $this->config = $config;
         $this->model  = $model;
     }
 
+    /**
+     * @return \noxkiwi\core\Config
+     */
     final protected function getConfig(): Config
     {
         return $this->config;
     }
 
+    /**
+     * @return \noxkiwi\dataabstraction\Model
+     */
     final protected function getModel(): Model
     {
         return $this->model;
     }
 
+    /**
+     * @param array $responseRow
+     * @param array $dataset
+     *
+     * @return array
+     */
     public function manipulateRow(array $responseRow, array $dataset): array
     {
         foreach ($this->getModel()->getFieldNames() as $fieldName) {
@@ -61,6 +77,13 @@ class Manipulator implements ManipulatorInterface
         return $responseRow;
     }
 
+    /**
+     * @param array $action
+     * @param array $responseRow
+     * @param array $dataset
+     *
+     * @return \noxkiwi\frontend\Tag\HtmlTag
+     */
     protected function buildAction(array $action, array $responseRow, array $dataset): HtmlTag
     {
         $action['link']['modelName']                        = $this->getModel()->getModelName();
@@ -98,6 +121,12 @@ class Manipulator implements ManipulatorInterface
         ];
     }
 
+    /**
+     * @param string $fieldName
+     * @param array  $dataset
+     *
+     * @return array
+     */
     private function manipulatePrimary(string $fieldName, array $dataset): array
     {
         return [
@@ -109,6 +138,11 @@ class Manipulator implements ManipulatorInterface
 
     private array $foundManipulators;
 
+    /**
+     * @param string $fieldName
+     *
+     * @return bool
+     */
     private function manipulatorFound(string $fieldName): bool
     {
         if (! isset($this->foundManipulators[$fieldName])) {
@@ -146,6 +180,7 @@ class Manipulator implements ManipulatorInterface
      * @param \noxkiwi\dataabstraction\Model $model
      * @param string                         $displayField
      *
+     * @throws \noxkiwi\singleton\Exception\SingletonException
      * @return string[]
      */
     private function manipulateRemoteList(string $fieldName, array $dataset, Model $model, string $displayField): array
@@ -161,7 +196,7 @@ class Manipulator implements ManipulatorInterface
             if (empty($remoteId)) {
                 continue;
             }
-            $remoteId = trim((string)$remoteId);
+            $remoteId = trim($remoteId);
             $entry    = $model->loadEntry($remoteId);
             $badge    = new Badge();
             if ($entry === null) {
@@ -200,7 +235,7 @@ HTML;
         $fieldId    = [$dataset[$fieldName] ?? ''];
         $display    = '';
         $filter     = '';
-        $a          = explode('\\', get_class($model));
+        $a          = explode('\\', $model::class);
         $modelClass = str_replace('Model', '', end($a));
         foreach ($fieldId as $fieldId) {
             $fieldId = trim((string)$fieldId);
@@ -227,12 +262,19 @@ HTML;
         return ['sort' => '', 'display' => $display, 'filter' => $filter];
     }
 
+    /**
+     * @param string                         $fieldName
+     * @param array                          $dataset
+     * @param \noxkiwi\dataabstraction\Model $model
+     *
+     * @return string[]
+     */
     private function manipulateFlagField(string $fieldName, array $dataset, Model $model): array
     {
         $display    = '';
         $filter     = '';
         $line       = '';
-        $a          = explode('\\', get_class($model));
+        $a          = explode('\\', $model::class);
         $modelClass = str_replace('Model', '', end($a));
         foreach ($model->getConfig()->get('flags', []) as $flagId => $flagValue) {
             if (($dataset[$fieldName] & $flagId) === $flagId) {
@@ -250,6 +292,13 @@ HTML;
         return ['sort' => '', 'display' => $display, 'filter' => $filter];
     }
 
+    /**
+     * @param string $fieldName
+     * @param array  $dataset
+     *
+     * @throws \noxkiwi\singleton\Exception\SingletonException
+     * @return array
+     */
     private function manipulateTranslatedField(string $fieldName, array $dataset): array
     {
         $translator  = Translator::getInstance();
@@ -277,11 +326,21 @@ HTML;
         return ['sort' => '', 'display' => $display, 'filter' => $key];
     }
 
+    /**
+     * @param array $datasets
+     *
+     * @return array
+     */
     public function manipulateDatasets(array $datasets): array
     {
         return $datasets;
     }
 
+    /**
+     * @param array $dataset
+     *
+     * @return array
+     */
     public function manipulateDataset(array $dataset): array
     {
         return $dataset;
