@@ -1,6 +1,8 @@
 <?php declare(strict_types = 1);
 namespace noxkiwi\crud\Interfaces;
 
+use noxkiwi\crud\Frontend\Cell;
+
 /**
  * I am the interface for all Manipulators.
  *
@@ -22,12 +24,14 @@ interface ManipulatorInterface
     public function manipulateRow(array $responseRow, array $dataset): array;
 
     /**
+     * I will manipulate the values for the given $fieldName.
+     *
      * @param string $fieldName
      * @param array  $dataset
      *
-     * @return mixed
+     * @return \noxkiwi\crud\Frontend\Cell
      */
-    public function manipulateField(string $fieldName, array $dataset);
+    public function manipulateField(string $fieldName, array $dataset): Cell;
 
     /**
      * @param array $datasets

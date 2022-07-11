@@ -53,8 +53,8 @@ abstract class CrudContext extends Context
         if (empty($modelName) || ! is_string($modelName)) {
             throw new InvalidArgumentException('YOU_MUST_GIVE_A_MODEL_NAME', E_ERROR);
         }
-        $this->model       = self::fetchModel($modelName);
-        $this->crud        = new Crud($this->model);
+        $this->model = self::fetchModel($modelName);
+        $this->crud  = new Crud($this->model);
         $this->request->set(Mvc::TEMPLATE, 'json');
         $this->response->set(Mvc::TEMPLATE, 'json');
         $this->setManipulator(new Manipulator($this->getModel(), $this->getCrud()->getConfig()));
@@ -62,6 +62,7 @@ abstract class CrudContext extends Context
 
     /**
      * I will set the Manipulator.
+     *
      * @param \noxkiwi\crud\Manipulator $manipulator
      */
     public function setManipulator(Manipulator $manipulator): void
@@ -70,6 +71,7 @@ abstract class CrudContext extends Context
     }
 
     /**
+     * I will return the Crud instance.
      * @return \noxkiwi\crud\Crud
      */
     final protected function getCrud(): Crud
@@ -78,6 +80,7 @@ abstract class CrudContext extends Context
     }
 
     /**
+     * I will return the Model instance.
      * @return \noxkiwi\dataabstraction\Model
      */
     final protected function getModel(): Model
@@ -86,26 +89,20 @@ abstract class CrudContext extends Context
     }
 
     /**
-     * I will show all known entries.
+     * I will show all known entries of the Model to show to on the front-end.
      */
     final protected function viewList(): void
     {
         $responseRows = [];
         $model        = $this->model;
-        $dataSets = $model->search();
-        foreach ($dataSets as $dataset) {
-            $responseRow    = $this->manipulator->manipulateRow($responseRow ?? [], $dataset);
-            $responseRows[] = $responseRow;
+        $dataSets     = $model->search();
+        if (! empty($this->manipulator)) {
+            foreach ($dataSets as $dataset) {
+                $responseRow    = $this->manipulator->manipulateRow($responseRow ?? [], $dataset);
+                $responseRows[] = $responseRow;
+            }
         }
         $this->response->set('data', $responseRows);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isAllowed(): bool
-    {
-        return true;
     }
 
     /**

@@ -4,10 +4,12 @@ namespace noxkiwi\crud;
 use noxkiwi\core\Config;
 use noxkiwi\core\Constants\Mvc;
 use noxkiwi\core\Helper\LinkHelper;
+use noxkiwi\crud\Frontend\Cell;
 use noxkiwi\crud\Interfaces\ManipulatorInterface;
 use noxkiwi\dataabstraction\Model;
 use noxkiwi\frontend\Element\Badge;
 use noxkiwi\frontend\Element\Icon;
+use noxkiwi\frontend\Tag\Html\Anchor;
 use noxkiwi\frontend\Tag\HtmlTag;
 use noxkiwi\translator\Traits\TranslatorTrait;
 use noxkiwi\translator\Translator;
@@ -62,6 +64,8 @@ class Manipulator implements ManipulatorInterface
     }
 
     /**
+     * I will manipulate the current row of the Crud List.
+     *
      * @param array $responseRow
      * @param array $dataset
      *
@@ -78,6 +82,8 @@ class Manipulator implements ManipulatorInterface
     }
 
     /**
+     * I will build an Action.
+     *
      * @param array $action
      * @param array $responseRow
      * @param array $dataset
@@ -91,7 +97,7 @@ class Manipulator implements ManipulatorInterface
         $action['link'][$this->getModel()->getPrimarykey()] = $dataset[$this->getModel()->getPrimarykey()];
         $url                                                = LinkHelper::get($action['link']);
         $editButton                                         = new Action();
-        $editButton->setTarget($action['target'] ?? Action::TARGET_TOP);
+        $editButton->setTarget($action['target'] ?? Anchor::TARGET_TOP);
         $editButton->setHref($url);
         $editButton->add(Icon::getFromName($action['icon']));
 
@@ -99,14 +105,14 @@ class Manipulator implements ManipulatorInterface
     }
 
     /**
-     * I will [To be filled by Jan]
+     * I will build all actions for the current $responseRow.
      *
      * @param array $responseRow
      * @param array $dataset
      *
-     * @return string[]
+     * @return \noxkiwi\crud\Frontend\Cell
      */
-    protected function buildActions(array $responseRow, array $dataset): array
+    protected function buildActions(array $responseRow, array $dataset): Cell
     {
         $actions = $this->getConfig()->get('action>element', []);
         $content = '';
@@ -114,222 +120,74 @@ class Manipulator implements ManipulatorInterface
             $content .= $this->buildAction($action, $responseRow, $dataset);
         }
 
-        return [
-            'sort'    => $content,
-            'display' => $content,
-            'filter'  => $content
-        ];
+        $cell = new Cell();
+        $cell->sort = $content;
+        $cell->display = $content;
+        $cell->filter = $content;
+        $cell->export = $content;
+        return $cell;
     }
 
     /**
+     * I am the standard manipulation for primary fields.
+     *
      * @param string $fieldName
      * @param array  $dataset
      *
-     * @return array
+     * @return \noxkiwi\crud\Frontend\Cell
      */
-    private function manipulatePrimary(string $fieldName, array $dataset): array
+    private function manipulatePrimary(string $fieldName, array $dataset): Cell
     {
-        return [
-            'sort'    => $dataset[$fieldName] ?? '',
-            'display' => $dataset[$fieldName] ?? '',
-            'filter'  => 'primary_' . $dataset[$fieldName] . '_' ?? '',
-        ];
+        $cell          = new Cell();
+        $cell->order   = $dataset[$fieldName] ?? '';
+        $cell->display = (string)$dataset[$fieldName];
+        $cell->filter  = 'primary_' . $dataset[$fieldName] . '_' ?? '';
+        $cell->export  = $cell->order;
+
+        return $cell;
     }
 
     private array $foundManipulators;
 
     /**
+     * I will return whether there is a manipulator method for the given $fieldName.
+     *
      * @param string $fieldName
      *
      * @return bool
      */
     private function manipulatorFound(string $fieldName): bool
     {
+        // Cache this in the instance for less CPU.
         if (! isset($this->foundManipulators[$fieldName])) {
-            $this->foundManipulators[$fieldName] = method_exists($this, "manipulate{$fieldName}");
+            $this->foundManipulators[$fieldName] = method_exists($this, "manipulate$fieldName");
         }
 
         return $this->foundManipulators[$fieldName];
     }
 
     /**
-     * @param string $fieldName
-     * @param array  $dataset
-     *
-     * @return string[]
+     * @inheritDoc
      */
-    public function manipulateField(string $fieldName, array $dataset): array
+    public function manipulateField(string $fieldName, array $dataset): Cell
     {
         if ($this->manipulatorFound($fieldName)) {
-            return $this->{"manipulate{$fieldName}"}($fieldName, $dataset);
+            return $this->{"manipulate$fieldName"}($fieldName, $dataset);
         }
         if ($this->getModel()->getPrimarykey() === $fieldName) {
             return $this->manipulatePrimary($fieldName, $dataset);
         }
+        $cell          = new Cell();
+        $cell->sort    = $dataset[$fieldName] ?? '';
+        $cell->display = $dataset[$fieldName] ?? '';
+        $cell->filter  = $dataset[$fieldName] ?? '';
+        $cell->export  = $dataset[$fieldName] ?? '';
 
-        return [
-            'sort'    => $dataset[$fieldName] ?? '',
-            'display' => $dataset[$fieldName] ?? '',
-            'filter'  => $dataset[$fieldName] ?? '',
-        ];
+        return $cell;
     }
 
     /**
-     * @param string                         $fieldName
-     * @param array                          $dataset
-     * @param \noxkiwi\dataabstraction\Model $model
-     * @param string                         $displayField
-     *
-     * @throws \noxkiwi\singleton\Exception\SingletonException
-     * @return string[]
-     */
-    private function manipulateRemoteList(string $fieldName, array $dataset, Model $model, string $displayField): array
-    {
-        $primaryKeys        = explode(',', trim((string)($dataset[$fieldName] ?? '')));
-        $display            = '';
-        $filter             = '';
-        $modelClassElements = explode('\\', $model::class);
-        $modelName          = str_replace('Model', '', end($modelClassElements));
-        $table              = $model::TABLE;
-        $translator         = Translator::getInstance();
-        foreach ($primaryKeys as $remoteId) {
-            if (empty($remoteId)) {
-                continue;
-            }
-            $remoteId = trim($remoteId);
-            $entry    = $model->loadEntry($remoteId);
-            $badge    = new Badge();
-            if ($entry === null) {
-                $url = '#';
-                $badge->addClass('bg-danger');
-                $badge->add("[MISSING $table] - $remoteId");
-            } else {
-                $badge->add("$remoteId: {$entry->{$displayField}}");
-                $url     = LinkHelper::get([
-                                               Mvc::CONTEXT => 'crudfrontend',
-                                               Mvc::VIEW    => 'list',
-                                               'modelName'  => $modelName,
-                                               'q'          => "primary_{$remoteId}_"
-                                           ]);
-                $content = $translator->translate((string)$entry->{$displayField});
-                $filter  .= "F:$content";
-            }
-            $display .= <<<HTML
-<a href="$url">$badge</a>
-HTML;
-        }
-
-        return ['sort' => '', 'display' => $display, 'filter' => $filter];
-    }
-
-    /**
-     * @param string                         $fieldName
-     * @param array                          $dataset
-     * @param \noxkiwi\dataabstraction\Model $model
-     * @param string                         $displayField
-     *
-     * @return string[]
-     */
-    private function manipulateRemote(string $fieldName, array $dataset, Model $model, string $displayField): array
-    {
-        $fieldId    = [$dataset[$fieldName] ?? ''];
-        $display    = '';
-        $filter     = '';
-        $a          = explode('\\', $model::class);
-        $modelClass = str_replace('Model', '', end($a));
-        foreach ($fieldId as $fieldId) {
-            $fieldId = trim((string)$fieldId);
-            $field   = $model->loadEntry($fieldId);
-            if ($field === null) {
-                continue;
-            }
-            $badge = new Badge();
-            $badge->add("{$fieldId}: {$field->{$displayField}}");
-            $url     = LinkHelper::get([
-                                           Mvc::CONTEXT => 'crudfrontend',
-                                           Mvc::VIEW    => 'list',
-                                           'modelName'  => $modelClass,
-                                           'q'          => "primary_{$fieldId}_"
-                                       ]);
-            $display .= <<<HTML
-<a href="$url">
-    $badge
-</a>
-HTML;
-            $filter  .= "F:{$field->{$displayField}}";
-        }
-
-        return ['sort' => '', 'display' => $display, 'filter' => $filter];
-    }
-
-    /**
-     * @param string                         $fieldName
-     * @param array                          $dataset
-     * @param \noxkiwi\dataabstraction\Model $model
-     *
-     * @return string[]
-     */
-    private function manipulateFlagField(string $fieldName, array $dataset, Model $model): array
-    {
-        $display    = '';
-        $filter     = '';
-        $line       = '';
-        $a          = explode('\\', $model::class);
-        $modelClass = str_replace('Model', '', end($a));
-        foreach ($model->getConfig()->get('flags', []) as $flagId => $flagValue) {
-            if (($dataset[$fieldName] & $flagId) === $flagId) {
-                $badge = new Badge();
-                $badge->setTitle("{$this->translate("{$modelClass}_FLAGS_{$flagValue}_DESCRIPTION")}");
-                $badge->add("{$flagId}: {$flagValue}");
-                $display .= <<<HTML
-$line $badge
-HTML;
-                $filter  .= " {$fieldName}";
-                $line    = '<br />';
-            }
-        }
-
-        return ['sort' => '', 'display' => $display, 'filter' => $filter];
-    }
-
-    /**
-     * @param string $fieldName
-     * @param array  $dataset
-     *
-     * @throws \noxkiwi\singleton\Exception\SingletonException
-     * @return array
-     */
-    private function manipulateTranslatedField(string $fieldName, array $dataset): array
-    {
-        $translator  = Translator::getInstance();
-        $key         = $dataset[$fieldName];
-        $translation = $translator->translate($key);
-        $badge       = new Badge();
-        $url         = LinkHelper::get([
-                                           Mvc::CONTEXT => 'crudfrontend',
-                                           Mvc::VIEW    => 'list',
-                                           'modelName'  => 'language',
-                                           'q'          => "primary_{$key}_"
-                                       ]);
-        $target      = '';
-        if ($translation === Translator::normalizeKey($key)) {
-            $url    = "?tool=translation&name=$key";
-            $target = ' target="blank"';
-            $badge->setClass($badge->getClassString() . 'bg-danger');
-            $badge->add(' [NOT TRANSLATED]  -  ');
-        }
-        $badge->add($translation);
-        $display = <<<HTML
-<a href="$url" $target>$badge</a><br />
-HTML;
-
-        return ['sort' => '', 'display' => $display, 'filter' => $key];
-    }
-
-    /**
-     * @param array $datasets
-     *
-     * @return array
+     * @inheritDoc
      */
     public function manipulateDatasets(array $datasets): array
     {
@@ -337,9 +195,7 @@ HTML;
     }
 
     /**
-     * @param array $dataset
-     *
-     * @return array
+     * @inheritDoc
      */
     public function manipulateDataset(array $dataset): array
     {
